@@ -9,7 +9,15 @@ module Main.Options where
 import Lib (Command (..))
 -- import LocalCooking.Database.Query.Salt (getPasswordSalt)
 import LocalCooking.Database.Schema.User as User
-import LocalCooking.Database.Schema.Facebook as Facebook
+import LocalCooking.Database.Schema.User.Role as UserRole
+import LocalCooking.Database.Schema.User.Pending as UserPending
+import LocalCooking.Database.Schema.Image as Image
+import LocalCooking.Database.Schema.IngredientDiet as IngDiet
+import LocalCooking.Database.Schema.Semantics as Seman
+import LocalCooking.Database.Schema.Tag.Meal as MealTag
+import LocalCooking.Database.Schema.Tag.Chef as ChefTag
+import LocalCooking.Database.Schema.Facebook.UserDetails as FacebookDetails
+import LocalCooking.Database.Schema.Facebook.AccessToken as FacebookAccess
 import LocalCooking.Database.Schema.Salt as Salt
 
 
@@ -24,11 +32,14 @@ import Database.Persist.Postgresql (createPostgresqlPool)
 
 commandParser :: Parser Command
 commandParser = subparser $
-  command "add-role" (info addParser (progDesc "Add a role to a user"))
+     command "add-role" (info addParser (progDesc "Add a role to a user"))
+  <> command "get-user" (info getUserParser (progDesc "Get a stored user"))
   where
     addParser = AddRole
             <$> argument str (metavar "EMAIL")
             <*> argument str (metavar "ROLE")
+    getUserParser = GetUser
+            <$> argument str (metavar "EMAIL")
 
 
 data ArgsImpl = ArgsImpl
@@ -83,8 +94,16 @@ mkEnv
     runStderrLoggingT (createPostgresqlPool connStr 10)
 
   flip runSqlPool db $ do
-    runMigration Facebook.migrateAll
     runMigration User.migrateAll
+    runMigration UserRole.migrateAll
+    runMigration UserPending.migrateAll
+    runMigration Image.migrateAll
+    runMigration IngDiet.migrateAll
+    runMigration Seman.migrateAll
+    runMigration MealTag.migrateAll
+    runMigration ChefTag.migrateAll
+    runMigration FacebookDetails.migrateAll
+    runMigration FacebookAccess.migrateAll
     runMigration Salt.migrateAll
 
   -- envSalt <- getPasswordSalt envDatabase
