@@ -4,6 +4,7 @@
 
 module Lib where
 
+import LocalCooking.Function.Common (getUsers)
 import LocalCooking.Common.User.Role (userRoleParser)
 import LocalCooking.Database.Query.User (userIdByEmail)
 import LocalCooking.Database.Query.Semantics.Admin (addRole)
@@ -24,6 +25,9 @@ data Command
     , addRoleUserRole  :: String
     }
   | GetUser
+    { getUserEmail :: String
+    }
+  | AddUser
     { getUserEmail :: String
     }
   -- | DelRole

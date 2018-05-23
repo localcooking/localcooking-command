@@ -23,6 +23,7 @@ dependencies:
 - base >= 4.7 && < 5
 - localcooking-db
 - localcooking-shared
+- localcooking-function
 - attoparsec
 - emailaddress >= 0.2.0.1
 - logging
