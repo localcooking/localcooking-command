@@ -35,10 +35,10 @@ resolver: lts-11.2
 #  - wai
 packages:
 - .
-- ../localcooking-db
-- ../localcooking-fb
-- ../localcooking-shared
-- ../localcooking-function
+- ./localcooking-db
+- ./localcooking-fb
+- ./localcooking-shared
+- ./localcooking-function
 - location:
     git: https://github.com/athanclark/saltine.git
     commit: 8debfd737231dc5f3eb5cf34f6da8c3d33bb8a4b
