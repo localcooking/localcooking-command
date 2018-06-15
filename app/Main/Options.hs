@@ -24,12 +24,14 @@ commandParser :: Parser Command
 commandParser = subparser $
      command "add-role" (info addParser (progDesc "Add a role to a user"))
   <> command "get-user" (info getUserParser (progDesc "Get a stored user"))
+  <> command "get-users" (info getUsersParser (progDesc "Get a stored user"))
   where
     addParser = AddRole
             <$> argument str (metavar "EMAIL")
             <*> argument str (metavar "ROLE")
     getUserParser = GetUser
             <$> argument str (metavar "EMAIL")
+    getUsersParser = pure GetUsers
 
 
 data ArgsImpl = ArgsImpl

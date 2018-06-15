@@ -1,12 +1,12 @@
 {-# LANGUAGE
     OverloadedStrings
+  , ScopedTypeVariables
   #-}
 
 module Lib where
 
-import LocalCooking.Function.Admin (getUsers)
 import LocalCooking.Common.User.Role (userRoleParser)
-import LocalCooking.Database.Schema.User (Unique (UniqueEmail))
+import LocalCooking.Database.Schema.User (StoredUser, Unique (UniqueEmail))
 import LocalCooking.Database.Query.Semantics.Admin (addRole)
 
 import Data.Monoid ((<>))
@@ -14,9 +14,10 @@ import qualified Data.Text as T
 import qualified Data.ByteString.UTF8 as BS8
 import Data.Attoparsec.Text (parseOnly)
 import Text.EmailAddress (emailAddress)
+import Control.Monad (forM_)
 import Database.Persist (Entity (..))
 import Database.Persist.Sql (ConnectionPool, runSqlPool)
-import Database.Persist.Class (get, getBy)
+import Database.Persist.Class (get, getBy, selectList)
 import System.Exit (exitFailure)
 
 
@@ -28,6 +29,7 @@ data Command
   | GetUser
     { getUserEmail :: String
     }
+  | GetUsers
   -- | AddUser
   --   { getUserEmail :: String
   --   }
@@ -70,3 +72,6 @@ runCommand (backend,cmd) = case cmd of
         Just (Entity userId _) -> do
           storedUserEnt <- flip runSqlPool backend (get userId)
           print storedUserEnt
+  GetUsers -> do
+    (us :: [Entity StoredUser]) <- flip runSqlPool backend $ selectList [] []
+    forM_ us print
