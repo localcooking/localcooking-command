@@ -8,17 +8,7 @@ module Main.Options where
 
 import Lib (Command (..))
 -- import LocalCooking.Database.Query.Salt (getPasswordSalt)
-import LocalCooking.Database.Schema.User as User
-import LocalCooking.Database.Schema.User.Role as UserRole
-import LocalCooking.Database.Schema.User.Pending as UserPending
-import LocalCooking.Database.Schema.Image as Image
-import LocalCooking.Database.Schema.IngredientDiet as IngDiet
-import LocalCooking.Database.Schema.Semantics as Seman
-import LocalCooking.Database.Schema.Tag.Meal as MealTag
-import LocalCooking.Database.Schema.Tag.Chef as ChefTag
-import LocalCooking.Database.Schema.Facebook.UserDetails as FacebookDetails
-import LocalCooking.Database.Schema.Facebook.AccessToken as FacebookAccess
-import LocalCooking.Database.Schema.Salt as Salt
+import LocalCooking.Database.Schema (migrateAll)
 
 
 import Options.Applicative (Parser, strOption, option, auto, long, help, value, showDefault, subparser, command, argument, str, progDesc, metavar, info)
@@ -93,18 +83,7 @@ mkEnv
                <> " dbname=" <> BS8.fromString argsImplDbName
     runStderrLoggingT (createPostgresqlPool connStr 10)
 
-  flip runSqlPool db $ do
-    runMigration User.migrateAll
-    runMigration UserRole.migrateAll
-    runMigration UserPending.migrateAll
-    runMigration Image.migrateAll
-    runMigration IngDiet.migrateAll
-    runMigration Seman.migrateAll
-    runMigration MealTag.migrateAll
-    runMigration ChefTag.migrateAll
-    runMigration FacebookDetails.migrateAll
-    runMigration FacebookAccess.migrateAll
-    runMigration Salt.migrateAll
+  migrateAll db
 
   -- envSalt <- getPasswordSalt envDatabase
 
