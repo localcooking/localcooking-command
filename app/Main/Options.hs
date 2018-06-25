@@ -7,15 +7,13 @@
 module Main.Options where
 
 import Lib (Command (..))
--- import LocalCooking.Database.Query.Salt (getPasswordSalt)
-import LocalCooking.Database.Schema (migrateAll)
-
+import LocalCooking.Database.Schema.Init (migrateEverything)
 
 import Options.Applicative (Parser, strOption, option, auto, long, help, value, showDefault, subparser, command, argument, str, progDesc, metavar, info)
 import qualified Data.ByteString.UTF8 as BS8
 import Data.Monoid ((<>))
 import Control.Monad.Logger (runStderrLoggingT)
-import Database.Persist.Sql (ConnectionPool, runMigration, runSqlPool)
+import Database.Persist.Sql (ConnectionPool, runSqlPool)
 import Database.Persist.Postgresql (createPostgresqlPool)
 
 
@@ -85,8 +83,6 @@ mkEnv
                <> " dbname=" <> BS8.fromString argsImplDbName
     runStderrLoggingT (createPostgresqlPool connStr 10)
 
-  migrateAll db
-
-  -- envSalt <- getPasswordSalt envDatabase
+  runSqlPool migrateEverything db
 
   pure (db, argsImplCommand)
