@@ -7,7 +7,10 @@ module Lib where
 
 import LocalCooking.Common.User.Role (userRoleParser)
 import LocalCooking.Database.Schema
-  ( StoredUser, Unique (UniqueEmail), addRole)
+  ( StoredUser
+  , Unique (UniqueEmail)
+  , EntityField (UserRoleStoredOwner)
+  , addRole)
 
 import Data.Monoid ((<>))
 import qualified Data.Text as T
@@ -16,7 +19,7 @@ import Data.Attoparsec.Text (parseOnly)
 import Text.EmailAddress (emailAddress)
 import Control.Monad (forM_)
 import Control.Monad.IO.Class (liftIO)
-import Database.Persist (Entity (..))
+import Database.Persist (Entity (..), (==.))
 import Database.Persist.Sql (ConnectionPool, runSqlPool)
 import Database.Persist.Class (get, getBy, selectList)
 import System.Exit (exitFailure)
@@ -75,6 +78,8 @@ runCommand (backend,cmd) = case cmd of
           Just (Entity userId _) -> do
             storedUserEnt <- get userId
             liftIO $ print storedUserEnt
+            roles <- selectList [UserRoleStoredOwner ==. userId] []
+            liftIO $ print roles
   GetUsers -> do
     -- TODO prettyprint
     (us :: [Entity StoredUser]) <- flip runSqlPool backend $ selectList [] []
